@@ -1,66 +1,57 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/db');
+const mongoose = require('mongoose');
+const { toJSON, paginate } = require('./plugins');
 
-const Payment = sequelize.define(
-  'Payment',
+const paymentSchema = mongoose.Schema(
   {
-    id: {
-      type: DataTypes.BIGINT,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    param6: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    plateNo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    paymentId: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    txnPayload: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    txnResult: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    txnResult2: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    txnStatus: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    passwordId: {
-      type: DataTypes.INTEGER,
-      unique: true,
-      allowNull: true,
-    },
     userId: {
-      type: DataTypes.INTEGER,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    currency: {
+      type: String,
+      default: 'usd',
+    },
+    paymentIntentId: {
+      type: String,
+      required: true,
       unique: true,
-      allowNull: true,
     },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
+    paymentMethod: {
+      type: String,
     },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
+    status: {
+      type: String,
+      enum: ['succeeded', 'requires_payment_method', 'requires_action', 'processing', 'canceled'],
+      required: true,
+    },
+    receiptEmail: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    metadata: {
+      type: Map,
+      of: String,
     },
   },
   {
     timestamps: true,
-    tableName: 'payment',
-    freezeTableName: true,
   }
 );
+
+paymentSchema.plugin(toJSON);
+paymentSchema.plugin(paginate);
+
+/**
+ * @typedef Payment
+ */
+const Payment = mongoose.model('Payment', paymentSchema);
 
 module.exports = Payment;

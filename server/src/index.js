@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { sequelize } = require('./config/db');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
@@ -11,15 +10,6 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
     logger.info(`Listening to port ${config.port}`);
   });
 });
-
-sequelize
-  .authenticate()
-  .then(() => {
-    logger.info('Connected to MariaDB');
-  })
-  .catch((error) => {
-    logger.error('Unable to connect to MariaDB', error);
-  });
 
 const exitHandler = () => {
   if (server) {
